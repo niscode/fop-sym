@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class AgentController : MonoBehaviour
 {
@@ -14,6 +15,13 @@ public class AgentController : MonoBehaviour
     private int count;              // 線の頂点の数を格納
 
     private string[] pointGoal = { "passage_to_1F", "stair_to_GF", "door_to_1F", "door_to_Outside" };
+
+
+    // show UI
+    private GameObject ui_Canvas;
+    public Text text_ID;
+  
+
 
     void Start()
     {
@@ -29,13 +37,34 @@ public class AgentController : MonoBehaviour
 
         line = GetComponent<LineRenderer>(); // LineRendererコンポーネントを取得
 
+
+        // show id on top of agent
+        ui_Canvas = transform.Find("ui_Canvas").gameObject;
+
+        Text id = Instantiate(text_ID, transform);
+        id.name = "id_" + gameObject.name;
+        id.text = gameObject.name;
+        id.transform.SetParent(ui_Canvas.transform);
+        // そのままインスタンス化すると、{pos: 0,200,150} / {scale: 2.5,2.5,2.5} に出現するためこれを変更
+        RectTransform rect = id.GetComponent<RectTransform>();
+        rect.localPosition = new Vector3(0f, 25f, 15f);
+        rect.localScale = new Vector3(0.25f, 0.25f, 0.25f);
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        
+
+        if (Input.GetMouseButtonDown(0))    // 左クリックした時
+        {
+            text_ID.enabled = false;
+        }
+
+        if (Input.GetMouseButtonDown(1))    // 右クリックした時
+        {
+            text_ID.enabled = true;
+        }
     }
 
     void FixedUpdate() // updateでもいいけど，fixedのほうが今回都合がいい
@@ -61,4 +90,5 @@ public class AgentController : MonoBehaviour
     {
         
     }
+    
 }

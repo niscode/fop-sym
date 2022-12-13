@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AgentGenerator : MonoBehaviour
 {
@@ -10,6 +13,7 @@ public class AgentGenerator : MonoBehaviour
     private string[] pointsNameArray = new string[9];  // 目的地を格納
     private int agent_num = 20; // エージェントを生成する数
     private int points_num = 9;  // 目的地の数
+
 
     // Start is called before the first frame update
     void Start()
@@ -23,17 +27,18 @@ public class AgentGenerator : MonoBehaviour
         // 生成するエージェントごとにpointNameにランダムで選ばれた目的地を代入していく
         for (int i=0; i < agent_num; i++)
         {
-            int rand = Random.Range(0, points_num);
+            int rand = UnityEngine.Random.Range(0, points_num);
             string human_id = pointsNameArray[rand];
             agent.GetComponent<AgentController>().pointName = human_id;  // 目的地の情報をAgentControllerに渡す
             GameObject obj = Instantiate(agent, new Vector3(0f, 0.6f, 0f), new Quaternion(0f, 0f, 0f, 0f));
             obj.name = "agent_" + i;
         }
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+       
     }
 }
