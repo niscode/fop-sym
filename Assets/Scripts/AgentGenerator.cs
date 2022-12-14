@@ -5,6 +5,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+// 1. ある地点から生成したい数だけのージェントをシーンに登場させる
+// 2. 目的地リストの中からエージェントごとにランダムな目的地を与える
+// 3. L2Bridge.csからHumanTracker上のデータを受け取って、エージェントをシーンに登場させる
+// 
+// Shogo Nishimura / niscode     Dec 2022
+
+
 public class AgentGenerator : MonoBehaviour
 {
     public GameObject agent;  // AgentのPrefabを格納

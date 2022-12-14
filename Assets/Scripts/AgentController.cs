@@ -4,6 +4,13 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
+// 1. エージェントごとに与えられた目的地に向かって移動させる
+// 2. 登場するエージェントの頭部には、エージェントの名前を表す文字を出現させる
+// 3. L2Bridge.csからHumanTracker上のデータを受け取って、エージェントを移動させる
+// 
+// Shogo Nishimura / niscode    Dec 2022
+
+
 public class AgentController : MonoBehaviour
 {
     public string pointName;        // 目的地を受け取るための変数
