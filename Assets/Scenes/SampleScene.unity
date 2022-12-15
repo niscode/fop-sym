@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -847,7 +847,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &691724299
 Transform:
   m_ObjectHideFlags: 0
@@ -875,8 +875,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 530aa9a315b2044f1a39ca92e865d5f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hostname: hil-mouse02
+  hostname: hil-mouse02.dil.atr.jp
   portN: 7003
+  running: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -2306,7 +2307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c494fa9ebe823414f95b0f3f66cca190, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 5198024035505138763, guid: b1b75ce8077034181a478aa36cc87084, type: 3}
+  agent: {fileID: 6246021869641259845, guid: b1b75ce8077034181a478aa36cc87084, type: 3}
   pointsArray:
   - {fileID: 716144203}
   - {fileID: 473376822}

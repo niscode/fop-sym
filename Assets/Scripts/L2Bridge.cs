@@ -6,36 +6,54 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-// human tracker に接続し、L2のデータを受け取る。
-// (シーン中のL2Generatorにアタッチが必要。)
-// 他のスクリプトが、受け取られたデータを得るには、 getData を呼ぶ。
+
+// 1. // human tracker に接続し、L2のデータを受け取る。
+// シーン中のL2Generatorにアタッチが必要。
+// 他のスクリプトが、受け取ったデータを得るには、 getData を呼ぶ。
+// 
+// Shogo Nishimura / niscode    Dec 2022
+
 
 public class L2Bridge : MonoBehaviour
 {
-    public string hostname = "hil-mouse02"; // ip: 10.186.38.42
+    public string hostname = "hil-mouse02.dil.atr.jp"; // ip: 10.186.38.42
+    // public string hostname = "10.186.38.42";
     public int portN = 7003;
+    public bool running = true;
 
-    private TcpClient socketConnection;
-    private Thread clientReceiveThread;
-    //private static L2DataDict l2datadict;
-    private bool running = true;
-
+    // UniqueID / time1 / time2 / pos.x , pos.z (total: 5 params)
     public class L2Data
     {
         public long id;         // Unique ID
-                                // public int type; 
         public DateTime time;   // 最後に検出されていた時刻  server_time
         public DateTime recieve_time;   // 最後に受信した時刻 ASPFBridgeが動いている時刻
-        public Vector3 pos;     // 検出されたX・Y座標（Unity上ではX,Z軸成分に格納）を格納　高さ（Y軸成分）に0.6fを格納。
+        public Vector2 pos2d;     // 検出されたX・Y座標（Unity上ではX,Z軸成分に格納）を格納　高さ（Y軸成分）に0.6fを格納。
     }
 
-    // UI
-    public 
+    public class L2DataDict : Dictionary<long, L2Data>
+    {
+        public L2DataDict() : base()
+        {
+        }
+        public L2DataDict(L2DataDict org) : base(org)
+        {
+        }
+    };
+
+    private TcpClient socketConnection;
+    private Thread clientReceiveThread;
+    private static L2DataDict l2datadict;
+    
+
+    /*--
+      ------------------------------------------------------------------------
+    --*/
 
     // Start is called before the first frame update
     void Start()
     {
-        ConnectToTcpServer();
+        l2datadict = new L2DataDict();  // L2DataDictクラス
+        ConnectToTcpServer();           // 起動時にサーバへ接続
     }
 
     // Update is called once per frame
@@ -44,8 +62,11 @@ public class L2Bridge : MonoBehaviour
         
     }
 
+    /*--
+      ------------------------------------------------------------------------
+    --*/
 
-    // サーバに接続しに行くメソッド
+    // サーバに接続しに行くメソッド ・・・・ Setup socket connection.
     private void ConnectToTcpServer()
     {
         try
@@ -56,7 +77,7 @@ public class L2Bridge : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log("On client connect exception " + e);
+            Debug.LogError("OMG 起動時サーバへの接続に失敗 ・・・ On client connect exception: " + e);
         }
     }
 
@@ -64,35 +85,48 @@ public class L2Bridge : MonoBehaviour
     private String ReadLine(NetworkStream stream)
     {
         String line = "";
+        int byte_num;
+
+        while (running)
+        {
+            if (stream.DataAvailable)  // 読み取り対象のデータがあるかどうかを判定
+            {
+                byte_num = stream.ReadByte();   // ストリームから 1 バイトを読み取り、ストリーム内の位置を 1 バイト進める
+                if (byte_num == 10)
+                {
+                    return (line);
+                }
+                else
+                {
+                    if (byte_num != 13)
+                    {
+                        line += Convert.ToChar(byte_num);   // 指定した値を Unicode 文字に変換
+                    }
+                }
+            }
+            else
+            {
+                System.Threading.Thread.Sleep(50);
+            }
+        }
         return (line);
-
-        //int d;
-        //while (running)
-        //{
-            //if (stream.DataAvailable)
-            //{
-                //d = stream.ReadByte();
-                //if (d == 10)
-                //{ // \n = 10?
-                //    return (line);
-                //}
-                //else
-                //{
-                //    if (d != 13)
-                //    {
-                //        line += Convert.ToChar(d);
-                //    }
-                //}
-            //}
-            //else
-            //{
-            //    // ミリ秒数 スレッドが中断される
-            //    System.Threading.Thread.Sleep(50);
-            //}
-        //}
-
-        //return (line);
     }
+
+    /* --
+    int byteData;
+    while (running)
+    {
+        if (stream.DataAvailable)
+        {
+            byteData = stream.ReadByte();
+            Debug.Log("ReadByte()によるデータの取得：" + byteData);
+        }
+        else
+        {
+            System.Threading.Thread.Sleep(50);
+        }
+    }
+    -- */
 
     // human tracker から得られた文字列を、データに変換する。
     // ==================================================
@@ -116,6 +150,10 @@ public class L2Bridge : MonoBehaviour
     // }
     // ==================================================
     // unix_time_sec, unix_time_msec, ...
+
+
+    // csvからデータを一行ずつリードするスクリプトを作ろう。
+
     private List<L2Data> ParseL2String(string line)
     {
         List<L2Data> ret = new List<L2Data>();
@@ -125,31 +163,15 @@ public class L2Bridge : MonoBehaviour
         DateTime time = DateTimeOffset.FromUnixTimeMilliseconds(unix_time_msec).LocalDateTime;  // unix_time -> DateTime
         DateTime now = DateTime.Now;
         int n = int.Parse(items[2]);  // 検出された人数
-        
+        //JObject json = JObject.Parse(items[5]);
 
-
-        //if (items.Length > 9)
-        //{
-        //    long unix_time_msec = long.Parse(items[0]) * 1000 + long.Parse(items[1]); // unix time (msec)
-        //    DateTime time = DateTimeOffset.FromUnixTimeMilliseconds(unix_time_msec).LocalDateTime; // unix_time -> DateTime
-        //    DateTime now = DateTime.Now;
-        //    int n = int.Parse(items[2]);
-        //    int head = 3;
-        //    for (int i = 0; i < n; i++)
-        //    {
-        //        L2Data l2data = new L2Data();
-        //        l2data.time = time;
-        //        l2data.receive_time = now;
-        //        l2data.id = long.Parse(items[head]); // human tracker でつけられた ID
-        //        l2data.type = int.Parse(items[head + 1]); // type
-        //        l2data.p.x = float.Parse(items[head + 2]); // x 座標
-        //        l2data.p.y = float.Parse(items[head + 3]); // y 座標
-        //                                                   // 未解明なデータが、 4 5                6                  7                      8
-        //                                                   //                   -1 8.14641676737030 -0.551659472481993 -0.036899607406078500  -1
-        //        ret.Add(l2data);
-        //        head += 9;
-        //    }
-        //}
+        L2Data l2data = new L2Data();
+        l2data.time = time;
+        l2data.recieve_time = now;
+        l2data.id = n;
+        l2data.pos2d.x = float.Parse(items[5]);
+        l2data.pos2d.y = float.Parse(items[5]);
+        ret.Add(l2data);
 
         return (ret);
     }
@@ -169,19 +191,44 @@ public class L2Bridge : MonoBehaviour
                     SendStartMessage();
                     Debug.Log("Sucess connecting to server");
                     String line;
+
                     while ((line = ReadLine(stream)) != null && running)
                     {
-                        // ParseL2Stringメソッドを使って
-                        List<L2Data> l2datalist = ParseL2String(line);
+                        string[] items = line.Split(',');   // 長さ: 21
 
+                        for (int i = 0; i < items.Length; i++)
+                        {
+                            Debug.Log(i + " 番目の中身: " + items[i]);
+                        }
+                        
+                        //long unix_time_msec = long.Parse(items[0]) * 1000 + long.Parse(items[1]);
+                        //DateTime time = DateTimeOffset.FromUnixTimeMilliseconds(unix_time_msec).LocalDateTime;
+                        //Debug.Log("【UNIX TIME MSEC】-> " + time);
+
+                        //long unix_time_msec = long.Parse(items[0]) * 1000 + long.Parse(items[1]);
+
+                        //ParseL2Stringメソッドを使って
+                        //List<L2Data> l2datalist = ParseL2String(line);
                         //lock (l2datadict)
                         //{
                         //    l2datadict.Clear();
-                        //    foreach (L2Data l2data in l2datalist)
+                        //    foreach(L2Data l2data in l2datalist)
                         //    {
-                        //        l2datadict.Add(l2data.id, l2data); // 新規にデータを追加
+                        //        l2datadict.Add(l2data.id, l2data);     // 新規にデータを追加
                         //    }
-                        //}
+                        //}    
+
+
+                        //long unix_time_msec = long.Parse(items[0]) * 1000 + long.Parse(items[1]);               // unix time (msec)
+                        //Debug.Log("【UNIX TIME MSEC】-> " + unix_time_msec);
+
+                        //int n = int.Parse(items[2]);  // 検出された人数
+                        //Debug.Log("【検出された人数】-> " + n);
+
+                        //JObject json = JObject.Parse(items[5]); // JSONの中身
+                        //Debug.Log("【JSONの中身】-> " + json);
+
+
                     }
                 }
                 Debug.Log("Server connection end");
@@ -222,4 +269,9 @@ public class L2Bridge : MonoBehaviour
         }
     }
 
+    public void OnApplicationQuit()
+    {
+        running = false;
+        clientReceiveThread.Join();
+    }
 }
