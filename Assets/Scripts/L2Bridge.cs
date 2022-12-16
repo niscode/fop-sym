@@ -16,8 +16,8 @@ using UnityEngine;
 
 public class L2Bridge : MonoBehaviour
 {
-    //public string hostname = "hil-mouse02.dil.atr.jp"; // ip: 10.186.38.42
-    public string hostname = "hil-mouse02";     // ip: 10.186.38.42
+    public string hostname = "hil-mouse02.dil.atr.jp"; // ip: 10.186.38.42
+    // public string hostname = "10.186.38.42";
     public int portN = 7003;
     public bool running = true;
 
