@@ -5,8 +5,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+using Newtonsoft.Json.Linq;
 
-
+// ### L2Bridge ###
 // 1. // human tracker に接続し、L2のデータを受け取る。
 // シーン中のL2Generatorにアタッチが必要。
 // 他のスクリプトが、受け取ったデータを得るには、 getData を呼ぶ。
@@ -86,7 +87,21 @@ public class L2Bridge : MonoBehaviour
     {
         String line = "";
         int byte_num;
-
+        /* --
+        int byteData;
+        while (running)
+        {
+            if (stream.DataAvailable)
+            {
+                byteData = stream.ReadByte();
+                Debug.Log("ReadByte()によるデータの取得：" + byteData);
+            }
+            else
+            {
+                System.Threading.Thread.Sleep(50);
+            }
+        }
+        -- */
         while (running)
         {
             if (stream.DataAvailable)  // 読み取り対象のデータがあるかどうかを判定
@@ -112,21 +127,6 @@ public class L2Bridge : MonoBehaviour
         return (line);
     }
 
-    /* --
-    int byteData;
-    while (running)
-    {
-        if (stream.DataAvailable)
-        {
-            byteData = stream.ReadByte();
-            Debug.Log("ReadByte()によるデータの取得：" + byteData);
-        }
-        else
-        {
-            System.Threading.Thread.Sleep(50);
-        }
-    }
-    -- */
 
     // human tracker から得られた文字列を、データに変換する。
     // ==================================================
@@ -153,7 +153,6 @@ public class L2Bridge : MonoBehaviour
 
 
     // csvからデータを一行ずつリードするスクリプトを作ろう。
-
     private List<L2Data> ParseL2String(string line)
     {
         List<L2Data> ret = new List<L2Data>();
@@ -219,18 +218,24 @@ public class L2Bridge : MonoBehaviour
                             // int n = int.Parse(items[2]);  // 検出された人数
                             // Debug.Log("【検出された人数】-> " + n);
                             
-                            string[] json;
-                            var builder = new StringBuilder();
+                            StringBuilder sb = new StringBuilder();
                             // まず6 - 21番目 をカンマ区切りでつなげることでjson形式化する
                             for (int i = 5; i < items.Length; i++)
                             {
                                 if (i == items.Length-1) {
-                                    builder.Append(items[i]);   // 末尾のカンマはいらない
+                                    sb.Append(items[i]);   // 末尾のカンマはいらない
                                 }else{
-                                    builder.Append(items[i]).Append(",");
+                                    sb.Append(items[i]).Append(",");
                                 }
                             }
-                            // Debug.Log("【くっつけてみた】" + builder);
+                            // Debug.Log("【くっつけてみた】" + sb.ToString());
+
+                            JObject json = JObject.Parse(sb.ToString());
+                            // Debug.Log("【JSON】" + json);
+                            foreach (var e in json)
+                            {
+                                Debug.Log("【JSON書き出し】" + e);
+                            }
 
                             // 取り出したい値
                             // [12] "uniqueID":"0"
@@ -260,10 +265,6 @@ public class L2Bridge : MonoBehaviour
 
                         //int n = int.Parse(items[2]);  // 検出された人数
                         //Debug.Log("【検出された人数】-> " + n);
-
-                        //JObject json = JObject.Parse(items[5]); // JSONの中身
-                        //Debug.Log("【JSONの中身】-> " + json);
-
 
                     }
                 }

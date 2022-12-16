@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ### AgentGenerator ###
+// ### AgentController ###
 // 1. エージェントごとに与えられた目的地に向かって移動させる
 // 2. 登場するエージェントの頭部には、エージェントの名前を表す文字を出現させる
 // 3. L2Bridge.csからHumanTracker上のデータを受け取って、エージェントを移動させる
@@ -17,7 +17,7 @@ public class AgentController : MonoBehaviour
 {
     public string pointName;        // 目的地を受け取るための変数
 
-    private NavMeshAgent agent;     // NavMeshAgentコンポーネントを格納
+    private UnityEngine.AI.NavMeshAgent agent;     // NavMeshAgentコンポーネントを格納
     private GameObject destination; // 目的地のSphereを格納
 
     private LineRenderer line;      // LineRendererコンポーネントを格納
@@ -35,10 +35,10 @@ public class AgentController : MonoBehaviour
     void Start()
     {
         // NavMeshAgentコンポーネントと目的地のオブジェクトを取得
-        agent = GetComponent<NavMeshAgent>();
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         destination = GameObject.Find(pointName);  // 目的地に設定した地点名を指定
 
-        if (agent.pathStatus != NavMeshPathStatus.PathInvalid)
+        if (agent.pathStatus != UnityEngine.AI.NavMeshPathStatus.PathInvalid)
         {
             // 目的地を指定(目的地のオブジェクトの位置情報を渡す）
             agent.SetDestination(destination.transform.position);
