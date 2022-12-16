@@ -201,7 +201,6 @@ public class L2Bridge : MonoBehaviour
                         // }
 
                         if(items[0] != "HELLO LAY2 003"){
-                            
                             // long unix_time;
                             // long.TryParse(items[0], out unix_time);
                             // Debug.Log($"UNIX TIME: {unix_time}");
@@ -219,7 +218,6 @@ public class L2Bridge : MonoBehaviour
                             // Debug.Log("【検出された人数】-> " + n);
                             
                             StringBuilder sb = new StringBuilder();
-                            // まず6 - 21番目 をカンマ区切りでつなげることでjson形式化する
                             for (int i = 5; i < items.Length; i++)
                             {
                                 if (i == items.Length-1) {
@@ -232,20 +230,21 @@ public class L2Bridge : MonoBehaviour
 
                             JObject json = JObject.Parse(sb.ToString());
                             // Debug.Log("【JSON】" + json);
-                            foreach (var e in json)
-                            {
-                                Debug.Log("【JSON書き出し】" + e);
-                            }
 
-                            // 取り出したい値
-                            // [12] "uniqueID":"0"
-                            // [13] "oTheta": "0.0"
-                            // [14] "y": "0.0"
-                            // [15] "x": "0.0"
-                            // [16] "z": "0.0"
-                            // [18] "id": "15297850"
-                            // [20] "mTheta": "0.0"}
+                            // int uniqueID = int.Parse(json.Value<string>("uniqueID"));
+                            float y = float.Parse(json.Value<string>("y")) / 1000;
+                            float x = float.Parse(json.Value<string>("x")) / 1000;
+                            long id = long.Parse(json.Value<string>("id"));
 
+                            // Debug.Log("【uniqueID】" + uniqueID);
+                            Debug.Log("【Y】" + y);
+                            Debug.Log("【X】" + x);
+                            Debug.Log("【id】" + id);
+
+                            //foreach (var e in json)
+                            //{
+                            //    Debug.Log("【JSON書き出し】" + e);
+                            //}
                         }
                         
                         //ParseL2Stringメソッドを使って
