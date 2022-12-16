@@ -37,7 +37,7 @@ public class AgentGenerator : MonoBehaviour
             int rand = UnityEngine.Random.Range(0, points_num);
             string human_id = pointsNameArray[rand];
             agent.GetComponent<AgentController>().pointName = human_id;  // 目的地の情報をAgentControllerに渡す
-            GameObject obj = Instantiate(agent, new Vector3(0f, 0.6f, 0f), new Quaternion(0f, 0f, 0f, 0f));
+            GameObject obj = Instantiate(agent, gameObject.transform.position, new Quaternion(0f, 0f, 0f, 0f));
             obj.name = "agent_" + i;
         }
 

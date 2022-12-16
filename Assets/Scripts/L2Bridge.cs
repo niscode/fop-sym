@@ -25,7 +25,7 @@ public class L2Bridge : MonoBehaviour
     // UniqueID / time1 / time2 / pos.x , pos.z (total: 5 params)
     public class L2Data
     {
-        public long id;         // Unique ID
+        public long id;         // ID
         public DateTime time;   // 最後に検出されていた時刻  server_time
         public DateTime recieve_time;   // 最後に受信した時刻 ASPFBridgeが動いている時刻
         public Vector2 pos2d;     // 検出されたX・Y座標（Unity上ではX,Z軸成分に格納）を格納　高さ（Y軸成分）に0.6fを格納。
