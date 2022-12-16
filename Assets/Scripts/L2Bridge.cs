@@ -196,17 +196,53 @@ public class L2Bridge : MonoBehaviour
                     {
                         string[] items = line.Split(',');   // 長さ: 21
 
-                        for (int i = 0; i < items.Length; i++)
-                        {
-                            Debug.Log(i + " 番目の中身: " + items[i]);
+                        // for (int i = 0; i < items.Length; i++)
+                        // {
+                        //     Debug.Log(i + " 番目の中身: " + items[i]);
+                        // }
+
+                        if(items[0] != "HELLO LAY2 003"){
+                            
+                            // long unix_time;
+                            // long.TryParse(items[0], out unix_time);
+                            // Debug.Log($"UNIX TIME: {unix_time}");
+                            // long msec;
+                            // long.TryParse(items[1], out msec);
+                            // Debug.Log($"msec: {msec}");
+                            // long unix_time_msec = unix_time * 1000 + msec;
+
+                            
+                            // long unix_time_msec = long.Parse(items[0]) * 1000 + long.Parse(items[1]);
+                            // DateTime time = DateTimeOffset.FromUnixTimeMilliseconds(unix_time_msec).LocalDateTime;
+                            // Debug.Log("【UNIX TIME MSEC】-> " + time);
+
+                            // int n = int.Parse(items[2]);  // 検出された人数
+                            // Debug.Log("【検出された人数】-> " + n);
+                            
+                            string[] json;
+                            var builder = new StringBuilder();
+                            // まず6 - 21番目 をカンマ区切りでつなげることでjson形式化する
+                            for (int i = 5; i < items.Length; i++)
+                            {
+                                if (i == items.Length-1) {
+                                    builder.Append(items[i]);   // 末尾のカンマはいらない
+                                }else{
+                                    builder.Append(items[i]).Append(",");
+                                }
+                            }
+                            // Debug.Log("【くっつけてみた】" + builder);
+
+                            // 取り出したい値
+                            // [12] "uniqueID":"0"
+                            // [13] "oTheta": "0.0"
+                            // [14] "y": "0.0"
+                            // [15] "x": "0.0"
+                            // [16] "z": "0.0"
+                            // [18] "id": "15297850"
+                            // [20] "mTheta": "0.0"}
+
                         }
                         
-                        //long unix_time_msec = long.Parse(items[0]) * 1000 + long.Parse(items[1]);
-                        //DateTime time = DateTimeOffset.FromUnixTimeMilliseconds(unix_time_msec).LocalDateTime;
-                        //Debug.Log("【UNIX TIME MSEC】-> " + time);
-
-                        //long unix_time_msec = long.Parse(items[0]) * 1000 + long.Parse(items[1]);
-
                         //ParseL2Stringメソッドを使って
                         //List<L2Data> l2datalist = ParseL2String(line);
                         //lock (l2datadict)
